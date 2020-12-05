@@ -5,7 +5,7 @@ import time
 import json
 
 DICTINARY_FILE = "dict.json"
-DICTINARY_URL = "https://bundr.ch/experimental/dict.json"
+DICTINARY_URL = "https://bundr.net/experimental/dict.json"
 DICTINARY_FILE_LIST = "dict.list.json"
 DICTINARY_FILE_LIST_LOCAL = "dict.list.local.json"
 FRANKENSTEIN_PATH = "frankenstein/"
