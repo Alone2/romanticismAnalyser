@@ -2,15 +2,32 @@ from urllib import request
 import glob
 import os.path
 import time
+import json
 
+DICTINARY_FILE = "dict.json"
+DICTINARY_URL = "https://bundr.ch/experimental/dict.json"
+DICTINARY_FILE_LIST = "dict.list.json"
+DICTINARY_FILE_LIST_LOCAL = "dict.list.local.json"
 FRANKENSTEIN_PATH = "frankenstein/"
 FRANKENSTEIN_FILE = "frankenstein/Frankenstein Chapter 24.txt"
 FRANKENSTEIN_URL = "http://www.gutenberg.org/files/84/84-0.txt"
+WAIT_TIME_SEC = 200
+DICTINARY_API_JSON = "https://api.dictionaryapi.dev/api/v2/entries/en/"
+
+class CantAccessServerException(Exception):
+    pass
+
+class WordNotFoundException(Exception):
+    pass
 
 def main():
     if not os.path.isfile(FRANKENSTEIN_FILE):
         # Download and set up Frankenstein
         setuptext()
+
+    # generate Dictionary
+    offlineDict = dictionary(DICTINARY_FILE)
+
     # Get letter / chapter paths
     letterspaths = glob.glob(FRANKENSTEIN_PATH + "*Letter*.txt")
     letterspaths.sort()
@@ -34,8 +51,74 @@ def main():
     # chaptersletters[5]   => Chapter 2
     # chaptersletters[n+3] => Chapter n
     # ...
+    for k in chaptersletters:
+        words = k.replace("'", "").replace(")", "").replace("(", "").replace("\"", "").replace("-", "").replace("_", "").replace(",", "").replace(".", "").replace("\n", " ").replace(";", "").replace("?", "").replace("—", "").replace("!", "").replace(":", "").split(" ")
+        words = list(filter(None, words))
 
-    # print(chaptersletters[27])
+        # Do something with the words... 
+        i = 0
+        while i < len(words)-1:
+            w = words[i]
+            print("looking up:", w)
+            try:
+                offlineDict.getword(w) # That's the definition + everything you want to know about the word... See https://api.dictionaryapi.dev/api/v2/entries/en/turtle
+            except CantAccessServerException:
+                print("Can't access server (probably too many requests), waiting " + str(WAIT_TIME_SEC) + " secs and then trying again..")
+                time.sleep(WAIT_TIME_SEC)
+                i -= 1
+            except Exception:
+                pass
+            i += 1
+            if i % 64 == 0:
+                offlineDict.save()
+
+    # Save dict from time to time, 
+    # so if program gets terminated, not all data is lost!
+    offlineDict.save()
+
+class dictionary:
+    def __init__(self, dict_path):
+        self.words = {}
+        self.locallist = []
+        self.onlinelist = []
+        self.dict_path = dict_path
+        if not os.path.isfile(dict_path):
+            a = open(dict_path, 'a')
+            print("downloading dict.json ...")
+            data = getwebcontent(DICTINARY_URL)
+            a.write(data)
+            a.close()
+        self.loadfromfile()
+
+    def loadfromfile(self):
+        data = readfile(self.dict_path)
+        self.words = json.loads(data)
+
+    def save(self):
+        data = json.dumps(self.words, indent=3)
+        writefile(self.dict_path, data)
+
+    def getword(self, wordString):
+        wordString = wordString.lower()
+        url = DICTINARY_API_JSON + wordString
+        out = None
+        if wordString in self.words:
+            out = self.words[wordString]
+        else:
+            out = []
+            try:
+                web = getwebcontent(url)
+                for k in json.loads(web)[0]["meanings"]:
+                    out.append(k["partOfSpeech"])
+            except request.HTTPError as e:
+                if e.getcode() != 404:
+                    raise CantAccessServerException("Can't access server")
+            except Exception:
+                pass
+            self.words[wordString] = out
+        if len(out) < 1:
+            raise WordNotFoundException("Word not found")
+        return out
 
 def setuptext(output = True):
     if output:
@@ -59,6 +142,11 @@ def setuptext(output = True):
     out = out.replace("â","\"")
     out = out.replace("â","\"")
     out = out.replace("â","-")
+    out = out.replace("â","'")
+    out = out.replace("’","'")
+    out = out.replace("”","'")
+    out = out.replace("“","'")
+    out = out.replace("æ","ae")
     out = out.replace("â","'")
 
     # Generate all chapters
@@ -89,7 +177,6 @@ def getwebcontent(url):
     return bit.decode(encoding='utf-8')
 
 def writefile(filename, data):
-    print("wrote" , filename)
     f = open(filename, "w")
     f.write(data)
     f.close()

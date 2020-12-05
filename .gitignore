@@ -130,3 +130,6 @@ dmypy.json
 
 # my stuff
 frankenstein/
+dict.json
+dict.list.json
+dict.list.local.json
