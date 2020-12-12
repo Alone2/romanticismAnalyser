@@ -104,8 +104,8 @@ def main():
         print (cou, "/", len(words), " => score: " + str(cou / len(words) * 100) + "%")
         wordused = dict(sorted(wordused.items(), key=lambda item: item[1]))
         wordusedem = dict(sorted(wordusedem.items(), key=lambda item: item[1]))
-        writefile(FRANKENSTEIN_PATH + "Word_used_count_" + out + ".txt", json.dumps(wordused, indent=3))
-        writefile(FRANKENSTEIN_PATH + "Word_used_emo_count_" + out + ".txt", json.dumps(wordusedem, indent=3))
+        writefile(FRANKENSTEIN_PATH + "Word_used_count_" + out + ".json", json.dumps(wordused, indent=3))
+        writefile(FRANKENSTEIN_PATH + "Word_used_emo_count_" + out + ".json", json.dumps(wordusedem, indent=3))
 
     # Save dict from time to time, 
     # so if program gets terminated, not all data is lost!
