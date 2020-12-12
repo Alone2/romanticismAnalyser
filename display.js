@@ -9,7 +9,7 @@ document.querySelector("#read-button").addEventListener('click', function() {
     reader.readAsText(file);
 })
 
-function doChart(score) {
+function doChart(datasets) {
     var ctx = document.getElementById('myChart').getContext('2d');
     var chart = new Chart(ctx, {
         // The type of chart we want to create
@@ -43,12 +43,7 @@ function doChart(score) {
                 'Chapter 23',
                 'Chapter 24',
             ],
-            datasets: [{
-                label: 'How common words in the wordlist are',
-                backgroundColor: 'rgb(255, 99, 132)',
-                borderColor: 'rgb(255, 99, 132)',
-                data: score
-                }]
+            datasets: datasets
         },
 
         // Configuration options go here
