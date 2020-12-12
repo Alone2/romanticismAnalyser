@@ -200,6 +200,7 @@ def setuptext(output = True):
     out = out.replace("â","-")
     out = out.replace("â","'")
     out = out.replace("’","'")
+    out = out.replace("‘","'")
     out = out.replace("”","'")
     out = out.replace("“","'")
     out = out.replace("æ","ae")

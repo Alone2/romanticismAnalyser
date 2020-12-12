@@ -1,3 +1,6 @@
 [ ! -d ./wordlists  ] && mkdir wordlists
+rm score.json
 for file in ./wordlists/*
-    python romanticismAnalyzer.py "${file}" ./wordlists/"${file}" score.json
+do
+    python romaticismAnalizer.py $(basename -- "$fullfile") "${file}" score.json
+done
