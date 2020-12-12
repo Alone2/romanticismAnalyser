@@ -57,6 +57,9 @@ def main():
     # chaptersletters[n+3] => Chapter n
     # ...
     n = -1
+    howmanywords = 0
+    whenusedem = {}
+    writefile(FRANKENSTEIN_PATH + "Score.json", "[]")
     for k in chaptersletters:
         n += 1
         words = k.replace("'", "").replace(")", "").replace("(", "").replace("\"", "").replace("-", "").replace("_", "").replace(",", "").replace(".", "").replace("\n", " ").replace(";", "").replace("?", "").replace("—", "").replace("!", "").replace(":", "").split(" ")
@@ -68,7 +71,7 @@ def main():
         wordusedem = {}
         cou = 0
         while i < len(words)-1:
-            w = words[i]
+            w = words[i].lower()
             if w in wordused:
                 wordused[w] += 1
             else:
@@ -77,12 +80,14 @@ def main():
             i += 1
             for e in emotionalList:
                 if e.lower() == w:
+                    whenusedem[howmanywords] = w
                     cou += 1
                     if w in wordusedem:
                         wordusedem[w] += 1
                     else:
                         wordusedem[w] = 1
                     break
+            howmanywords += 1
             # print("looking up:", w)
             # wordClass = []
             # try:
@@ -94,19 +99,21 @@ def main():
             # except Exception:
             #     pass
 
-        print (n)
         out = ""
         if n > 3:
-            out = "Chapter" + str(n-3)
+            out = "Chapter_" + str(n-3)
         else:
-            out = "Letter" + str(n+1)
+            out = "Letter_" + str(n+1)
         print(out)
         print (cou, "/", len(words), " => score: " + str(cou / len(words) * 100) + "%")
+        a = json.loads(readfile(FRANKENSTEIN_PATH + "Score.json"))
+        writefile(FRANKENSTEIN_PATH + "Score.json", json.dumps(a + [cou / len(words) * 100], indent=3))
         wordused = dict(sorted(wordused.items(), key=lambda item: item[1]))
         wordusedem = dict(sorted(wordusedem.items(), key=lambda item: item[1]))
-        writefile(FRANKENSTEIN_PATH + "Word_used_count_" + out + ".json", json.dumps(wordused, indent=3))
-        writefile(FRANKENSTEIN_PATH + "Word_used_emo_count_" + out + ".json", json.dumps(wordusedem, indent=3))
+        writefile(FRANKENSTEIN_PATH + "Word_Used_Count_" + out + ".json", json.dumps(wordused, indent=3))
+        writefile(FRANKENSTEIN_PATH + "Word_Used_Wordlist_Count_" + out + ".json", json.dumps(wordusedem, indent=3))
 
+    writefile(FRANKENSTEIN_PATH + "When_Used.json", json.dumps(whenusedem, indent=3))
     # Save dict from time to time, 
     # so if program gets terminated, not all data is lost!
     offlineDict.save()
