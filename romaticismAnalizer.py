@@ -13,6 +13,7 @@ FRANKENSTEIN_FILE = "frankenstein/Frankenstein Chapter 24.txt"
 FRANKENSTEIN_URL = "http://www.gutenberg.org/files/84/84-0.txt"
 WAIT_TIME_SEC = 200
 DICTINARY_API_JSON = "https://api.dictionaryapi.dev/api/v2/entries/en/"
+EMOTIONAL_FILE = "emotional.txt"
 
 class CantAccessServerException(Exception):
     pass
@@ -41,6 +42,10 @@ def main():
     for k in chapterspaths:
         chaptersletters.append(readfile(k))
 
+    # Out list
+    emotionalTxt = readfile(EMOTIONAL_FILE)
+    emotionalList = emotionalTxt.split("\n")
+
     # Example Usage
     # ====================
     # chaptersletters[0]   => Letter 1
@@ -51,26 +56,56 @@ def main():
     # chaptersletters[5]   => Chapter 2
     # chaptersletters[n+3] => Chapter n
     # ...
+    n = -1
     for k in chaptersletters:
+        n += 1
         words = k.replace("'", "").replace(")", "").replace("(", "").replace("\"", "").replace("-", "").replace("_", "").replace(",", "").replace(".", "").replace("\n", " ").replace(";", "").replace("?", "").replace("—", "").replace("!", "").replace(":", "").split(" ")
         words = list(filter(None, words))
 
         # Do something with the words... 
         i = 0
+        wordused = {}
+        wordusedem = {}
+        cou = 0
         while i < len(words)-1:
             w = words[i]
-            print("looking up:", w)
-            try:
-                offlineDict.getword(w) # That's the definition + everything you want to know about the word... See https://api.dictionaryapi.dev/api/v2/entries/en/turtle
-            except CantAccessServerException:
-                print("Can't access server (probably too many requests), waiting " + str(WAIT_TIME_SEC) + " secs and then trying again..")
-                time.sleep(WAIT_TIME_SEC)
-                i -= 1
-            except Exception:
-                pass
+            if w in wordused:
+                wordused[w] += 1
+            else:
+                wordused[w] = 1
+            # print(i, "/", len(words)-1)
             i += 1
-            if i % 64 == 0:
-                offlineDict.save()
+            for e in emotionalList:
+                if e.lower() == w:
+                    cou += 1
+                    if w in wordusedem:
+                        wordusedem[w] += 1
+                    else:
+                        wordusedem[w] = 1
+                    break
+            # print("looking up:", w)
+            # wordClass = []
+            # try:
+            #     wordClass = offlineDict.getword(w) # That's the definition + everything you want to know about the word... See https://api.dictionaryapi.dev/api/v2/entries/en/turtle
+            # except CantAccessServerException:
+            #     print("Can't access server (probably too many requests), waiting " + str(WAIT_TIME_SEC) + " secs and then trying again..")
+            #     time.sleep(WAIT_TIME_SEC)
+            #     i -= 1
+            # except Exception:
+            #     pass
+
+        print (n)
+        out = ""
+        if n > 3:
+            out = "Chapter" + str(n-3)
+        else:
+            out = "Letter" + str(n+1)
+        print(out)
+        print (cou, "/", len(words), " => score: " + str(cou / len(words) * 100) + "%")
+        wordused = dict(sorted(wordused.items(), key=lambda item: item[1]))
+        wordusedem = dict(sorted(wordusedem.items(), key=lambda item: item[1]))
+        writefile(FRANKENSTEIN_PATH + "Word_used_count_" + out + ".txt", json.dumps(wordused, indent=3))
+        writefile(FRANKENSTEIN_PATH + "Word_used_emo_count_" + out + ".txt", json.dumps(wordusedem, indent=3))
 
     # Save dict from time to time, 
     # so if program gets terminated, not all data is lost!
