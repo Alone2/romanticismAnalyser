@@ -48,6 +48,43 @@ function doChart(datasets) {
         },
 
         // Configuration options go here
-        options: {}
+        options: {
+            legend: {
+                labels: {
+                    fontColor: "rgba(255, 255, 255, 1)"
+                }
+            },
+            responsive: true,
+            title: {
+                display: true,
+                text: "Romanticism in frankenstein",
+                fontColor: "rgba(255, 255, 255, 1)"
+            },
+            scales: {
+                xAxes: [{
+                    scaleLabel : {
+                        fontColor: "rgba(255, 255, 255, 1)"
+                    },
+                    gridLines: {
+                        color: "rgba(255, 255, 255, 0.5)"
+                    },
+                    ticks: {
+                        fontColor: "rgba(255, 255, 255, 1)"
+                    }
+
+                }],
+                yAxes: [{
+                    scaleLabel : {
+                        fontColor: "rgba(255, 255, 255, 1)"
+                    },
+                    gridLines: {
+                        color: "rgba(255, 255, 255, 0.5)"
+                    },
+                    ticks: {
+                        fontColor: "rgba(255, 255, 255, 1)"
+                    }
+                }]
+            }
+        }
     });
 }
