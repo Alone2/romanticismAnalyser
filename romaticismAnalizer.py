@@ -4,6 +4,7 @@ import os.path
 import time
 import json
 import sys
+import random
 
 DICTINARY_FILE = "dict.json"
 DICTINARY_URL = "https://bundr.net/experimental/dict.json"
@@ -80,14 +81,16 @@ def main(arg = "Theme", arg2 = EMOTIONAL_FILE, jsFile=None):
             # print(i, "/", len(words)-1)
             i += 1
             for e in emotionalList:
-                if e.lower() == w:
-                    whenusedem[howmanywords] = w
-                    cou += 1
-                    if w in wordusedem:
-                        wordusedem[w] += 1
-                    else:
-                        wordusedem[w] = 1
-                    break
+                ee = e.lower()
+                for eee in [ee, ee + "ful", ee + "fully", ee + "ed", ee + "ing", ee + "edly", ee + "s"]:
+                    if eee.lower() == w:
+                        whenusedem[howmanywords] = w
+                        cou += 1
+                        if w in wordusedem:
+                            wordusedem[w] += 1
+                        else:
+                            wordusedem[w] = 1
+                        break
             howmanywords += 1
             # print("looking up:", w)
             # wordClass = []
@@ -120,10 +123,29 @@ def main(arg = "Theme", arg2 = EMOTIONAL_FILE, jsFile=None):
         except:
             pass
         fs = json.loads(readfile(FRANKENSTEIN_PATH + "Score_" + arg + ".json"))
+        rgb = []
+        while True:
+            rgb = [255,1]
+            rgb.append((random.randint(0, 2)*127 + 1)%256)
+            random.shuffle(rgb)
+            cont = False
+            for ka in a:
+                rgb2 = ka["borderColor"].replace("rgb(","").replace(")","").split(", ")
+                lel = 0
+                for i in range(len(rgb)):
+                    if rgb[i] == int(rgb2[i]):
+                        lel += 1
+                if lel == 3:
+                    cont = True
+            if not cont:
+                break
         a.append({
                 "label": arg,
-                "backgroundColor": 'rgb(255, 99, 132)',
-                "borderColor": 'rgb(255, 99, 132)',
+                # "backgroundColor": 'rgba(255, 99, 132, 0.05)',
+                "backgroundColor": 'rgba(' + str(rgb[0])+ ', ' + str(rgb[1])+', ' + str(rgb[2])+', 0.05)',
+                # "hoverBackgroundColor": 'rgba(255, 99, 132)',
+                "borderColor": 'rgb(' + str(rgb[0] )+ ', ' + str(rgb[1])+', ' + str(rgb[2])+')',
+                # "hoverBorderColor": 'rgb(255, 99, 132)',
                 "data": fs
             })
         writefile(jsFile, json.dumps(a,indent=3))
