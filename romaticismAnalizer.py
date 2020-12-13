@@ -82,7 +82,7 @@ def main(arg = "Theme", arg2 = EMOTIONAL_FILE, jsFile=None):
             i += 1
             for e in emotionalList:
                 ee = e.lower()
-                for eee in [ee, ee + "ful", ee + "fully", ee + "ed", ee + "ing", ee + "edly", ee + "s"]:
+                for eee in [ee, ee + "ful", ee + "fully", ee + "ed", ee + "ing", ee + "edly", ee + "s", ee + "ly"]:
                     if eee.lower() == w:
                         whenusedem[howmanywords] = w
                         cou += 1
@@ -135,6 +135,8 @@ def main(arg = "Theme", arg2 = EMOTIONAL_FILE, jsFile=None):
                 for i in range(len(rgb)):
                     if rgb[i] == int(rgb2[i]):
                         lel += 1
+                if (rgb[1] == rgb2[1] == 255) and rgb[0] != 255 and rgb[2] != 255:
+                    cont = True
                 if lel == 3:
                     cont = True
             if not cont:
