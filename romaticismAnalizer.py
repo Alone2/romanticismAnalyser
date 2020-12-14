@@ -36,12 +36,16 @@ def main(arg = "Theme", arg2 = EMOTIONAL_FILE, jsFile=None):
     letterspaths.sort()
     chapterspaths = glob.glob(FRANKENSTEIN_PATH + "*Chapter*.txt")
     chapterspaths.sort()
+    waltonpaths = glob.glob(FRANKENSTEIN_PATH + "*Walton*.txt")
+    chapterspaths.sort()
 
     # put text of book in list 
     chaptersletters = []
     for k in letterspaths:
         chaptersletters.append(readfile(k))
     for k in chapterspaths:
+        chaptersletters.append(readfile(k))
+    for k in waltonpaths:
         chaptersletters.append(readfile(k))
 
     # Out list
@@ -106,6 +110,8 @@ def main(arg = "Theme", arg2 = EMOTIONAL_FILE, jsFile=None):
         out = ""
         if n > 3:
             out = "Chapter_" + str(n-3)
+        elif n > 24:
+            out = "Walton_" + str(n+1)
         else:
             out = "Letter_" + str(n+1)
         print(out)
@@ -236,19 +242,22 @@ def setuptext(output = True):
         chapters.append("Letter " + str(k) + "\r\n")
     for k in range(1, 25):
         chapters.append("Chapter " + str(k) + "\r\n")
+    chapters.append("Walton, _in continuation._")
 
     # Save every chaptre in a different file
     oldk = chapters[0]
     out = out.split(oldk)[1]
     for k in chapters[1:]:
         outS = out.split(k)
+        print(outS)
         if output:
             print("processing:", oldk[:-2], flush=True)
         out = outS[1]
         writefile(FRANKENSTEIN_PATH + "Frankenstein " + oldk[:7].strip() + " " +  str(int(oldk[7:-2])).zfill(2) + ".txt", outS[0])
         oldk = k
     newk = chapters[len(chapters)-1]
-    writefile(FRANKENSTEIN_PATH + "Frankenstein " + newk[:7].strip() + " " +  str(int(k[7:-2])).zfill(2) + ".txt", out)
+    # writefile(FRANKENSTEIN_PATH + "Frankenstein " + oldk[:7].strip() + " " +  str(int(oldk[7:-2])).zfill(2) + ".txt", outS[0])
+    writefile(FRANKENSTEIN_PATH + "Frankenstein Walton.txt", out)
 
     if output:
         print("Frankenstein set up!", flush=True)
