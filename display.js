@@ -43,6 +43,7 @@ function doChart(datasets) {
                 'Chapter 22',
                 'Chapter 23',
                 'Chapter 24',
+                'Walter, in continuation',
             ],
             datasets: datasets
         },
