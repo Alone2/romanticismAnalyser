@@ -24,13 +24,6 @@ class WordNotFoundException(Exception):
     pass
 
 def main(arg = "Theme", arg2 = EMOTIONAL_FILE, jsFile=None):
-    if not os.path.isfile(FRANKENSTEIN_FILE):
-        # Download and set up Frankenstein
-        setuptext()
-
-    # generate Dictionary
-    # offlineDict = dictionary(DICTINARY_FILE)
-
     # Get letter / chapter paths
     letterspaths = glob.glob(FRANKENSTEIN_PATH + "*Letter*.txt")
     letterspaths.sort()
@@ -96,17 +89,6 @@ def main(arg = "Theme", arg2 = EMOTIONAL_FILE, jsFile=None):
                             wordusedem[w] = 1
                         break
             howmanywords += 1
-            # print("looking up:", w)
-            # wordClass = []
-            # try:
-            #     wordClass = offlineDict.getword(w) # That's the definition + everything you want to know about the word... See https://api.dictionaryapi.dev/api/v2/entries/en/turtle
-            # except CantAccessServerException:
-            #     print("Can't access server (probably too many requests), waiting " + str(WAIT_TIME_SEC) + " secs and then trying again..")
-            #     time.sleep(WAIT_TIME_SEC)
-            #     i -= 1
-            # except Exception:
-            #     pass
-
         out = ""
         if n > 3:
             out = "Chapter_" + str(n-3)
@@ -158,9 +140,6 @@ def main(arg = "Theme", arg2 = EMOTIONAL_FILE, jsFile=None):
             })
         writefile(jsFile, json.dumps(a,indent=3))
     writefile(FRANKENSTEIN_PATH + "When_Used.json", json.dumps(whenusedem, indent=3))
-    # Save dict from time to time, 
-    # so if program gets terminated, not all data is lost!
-    # offlineDict.save()
 
 class dictionary:
     def __init__(self, dict_path):
@@ -205,62 +184,6 @@ class dictionary:
         if len(out) < 1:
             raise WordNotFoundException("Word not found")
         return out
-
-def setuptext(output = True):
-    if output:
-        print("downloading data...", flush=True)
-
-    # Mkdir
-    if not os.path.isdir(FRANKENSTEIN_PATH):
-        os.mkdir(FRANKENSTEIN_PATH)
-
-    # Download
-    out = getwebcontent(FRANKENSTEIN_URL)
-
-    # Only save the book
-    outS = out.split("\n")
-    outS = outS[101:7421]
-    out = ""
-    for k in outS:
-        out += k + "\n"
-
-    # Formatting
-    out = out.replace("â","\"")
-    out = out.replace("â","\"")
-    out = out.replace("â","-")
-    out = out.replace("â","'")
-    out = out.replace("’","'")
-    out = out.replace("‘","'")
-    out = out.replace("”","'")
-    out = out.replace("“","'")
-    out = out.replace("æ","ae")
-    out = out.replace("â","'")
-
-    # Generate all chapters
-    chapters = []
-    for k in range(1, 5):
-        chapters.append("Letter " + str(k) + "\r\n")
-    for k in range(1, 25):
-        chapters.append("Chapter " + str(k) + "\r\n")
-    chapters.append("Walton, _in continuation._")
-
-    # Save every chaptre in a different file
-    oldk = chapters[0]
-    out = out.split(oldk)[1]
-    for k in chapters[1:]:
-        outS = out.split(k)
-        print(outS)
-        if output:
-            print("processing:", oldk[:-2], flush=True)
-        out = outS[1]
-        writefile(FRANKENSTEIN_PATH + "Frankenstein " + oldk[:7].strip() + " " +  str(int(oldk[7:-2])).zfill(2) + ".txt", outS[0])
-        oldk = k
-    newk = chapters[len(chapters)-1]
-    # writefile(FRANKENSTEIN_PATH + "Frankenstein " + oldk[:7].strip() + " " +  str(int(oldk[7:-2])).zfill(2) + ".txt", outS[0])
-    writefile(FRANKENSTEIN_PATH + "Frankenstein Walton.txt", out)
-
-    if output:
-        print("Frankenstein set up!", flush=True)
 
 def getwebcontent(url):
     bit = request.urlopen(url).read()
