@@ -125,6 +125,8 @@ def main(arg = "Theme", arg2 = EMOTIONAL_FILE, jsFile=None):
                         lel += 1
                 if (rgb[1] == int(rgb2[1]) == 255) and rgb[0] != 255 and rgb[2] != 255:
                     cont = True
+                if rgb[1] == 1 and rgb[0] == 255 and rgb[2] == 128:
+                    cont = True
                 if lel == 3:
                     cont = True
             if not cont:
